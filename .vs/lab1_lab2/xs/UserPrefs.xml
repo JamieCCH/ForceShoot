@@ -2,8 +2,8 @@
   <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="Unity.Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/MoveObj.cs">
     <Files>
-      <File FileName="Assets/Scripts/MoveObj.cs" Line="59" Column="52" />
-      <File FileName="Assets/Scripts/Forces.cs" Line="36" Column="37" />
+      <File FileName="Assets/Scripts/MoveObj.cs" Line="115" Column="33" />
+      <File FileName="Assets/Scripts/Forces.cs" Line="46" Column="10" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
