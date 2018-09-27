@@ -11,16 +11,15 @@ public class MoveObj : MonoBehaviour {
     public InputField inputForce;
     public Text resultTitle;
     public Text showGauge;
-
+   
     private float pushForce = 0.0f;
     private float timeElapsed = 0.0f;
     private bool isRunning = false;
     Rigidbody rb = null;
     private float acceleration = 0.0f;
     private float expectedForce = 0.0f;
-    private bool canShoot = false;
 
-   
+    GameObject replayBtn;
 
     // Use this for initialization
     void Start () {
@@ -31,10 +30,12 @@ public class MoveObj : MonoBehaviour {
         expectedForce = rb.mass * acceleration;
         Debug.Log("expectedForce: " + expectedForce);
 
-        inputForce.text = "Enter Force";
-
-        //resultTitle = UI.Text.Find("Result");
+        inputForce.text = "";
         resultTitle.enabled = false;
+
+        replayBtn = GameObject.Find("Replay");
+        replayBtn.SetActive(false);
+
     }
 
     // Update is called once per frame
@@ -108,10 +109,12 @@ public class MoveObj : MonoBehaviour {
         Debug.Log("backEdge: " + backEdge);
         Debug.Log("object: " + transform.position.z);
 
+        replayBtn.SetActive(true);
+        resultTitle.enabled = true;
+
         if (objFrontEdge > frontEdge && objBackEdge < backEdge)
         {
             Debug.Log("Bingo!!");
-            resultTitle.enabled = true;
             showGauge.text = "ON";
         }
         if(objBackEdge > backEdge)
@@ -119,7 +122,7 @@ public class MoveObj : MonoBehaviour {
             float dist = objBackEdge - backEdge;
             Debug.Log("distance: "+dist);
             Debug.Log("Over shoot.");
-            resultTitle.enabled = true;
+
             showGauge.text = "over";
 
         }
@@ -127,7 +130,7 @@ public class MoveObj : MonoBehaviour {
             float dist = frontEdge - objFrontEdge;
             Debug.Log("distance: "+dist);
             Debug.Log("Under shoot.");
-            resultTitle.enabled = true;
+           
             showGauge.text = "under";
         }
     }
