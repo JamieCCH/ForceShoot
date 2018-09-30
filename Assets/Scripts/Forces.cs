@@ -12,8 +12,7 @@ public class Forces : MonoBehaviour {
     public float pushForce = 0.0f;
     private float m_elapsedTime = 0.0f;
     private bool m_isRunning = false;
-
-    private float m_acceleration = 0.0f;
+    //private float m_acceleration = 0.0f;
 
 
     // Use this for initialization

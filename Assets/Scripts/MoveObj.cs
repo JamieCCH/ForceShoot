@@ -5,23 +5,27 @@ using UnityEngine.UI;
 
 public class MoveObj : MonoBehaviour {
 
-    private float desiredTimeToDestination = 5.0f;
+    float desiredTimeToDestination = 2.5f;
 
     public Transform destination;
     public InputField inputForce;
     public Text resultTitle;
     public Text showGauge;
-   
-    private float pushForce = 0.0f;
-    private float timeElapsed = 0.0f;
-    private bool isRunning = false;
+
+    float pushForce = 0.0f;
+    float timeElapsed = 0.0f;
+    bool isRunning = false;
     Rigidbody rb = null;
-    private float acceleration = 0.0f;
-    private float expectedForce = 0.0f;
+    float acceleration = 0.0f;
+    float expectedForce = 0.0f;
+    GameObject replayBtn = null;
+    Vector3 spawnPoint;
 
-    GameObject replayBtn;
+    Player Jack;
+    Player Finn;
 
-    // Use this for initialization
+    int playTimes = 0;
+
     void Start () {
         rb = GetComponent<Rigidbody>();
 
@@ -36,16 +40,22 @@ public class MoveObj : MonoBehaviour {
         replayBtn = GameObject.Find("Replay");
         replayBtn.SetActive(false);
 
+        spawnPoint = GameObject.Find("startPoint").transform.position;
+
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            pushForce = float.Parse(inputForce.text);
-            isRunning = !isRunning;
-            //isRunning = true;
+
+            if (transform.position == spawnPoint)
+            {
+                playTimes++;
+                pushForce = float.Parse(inputForce.text);
+                isRunning = !isRunning;
+                timeElapsed = 0.0f;
+            }
         }
         if (!isRunning)
         {
@@ -56,20 +66,7 @@ public class MoveObj : MonoBehaviour {
     protected float CalculateAcceleration()
     {
         if (desiredTimeToDestination <= 0.0f)
-        {
             return 0.0f;
-        }
-
-        //this is all based on travelling on the z axis(forward vector)
-
-        //Vi = rb.velocity.z;
-        //Vf = ?
-        //time = desiredTimeToDestination
-        //d = Mathf.abs(transform.postion.z - destination.position.z)
-        //a = ?
-
-        //(the formula: ) d = vi*t +0.5*a*t^2
-        //so: a = (d - vi*t)/0.5*t^2
 
         float Vi = rb.velocity.z;
         float d = Mathf.Abs(destination.position.z - transform.position.z);
@@ -86,60 +83,53 @@ public class MoveObj : MonoBehaviour {
 
             rb.AddForce(transform.forward * pushForce, ForceMode.Force);
 
-            //rb.AddForce(transform.forward * acceleration, ForceMode.Acceleration);
-
             if (timeElapsed > desiredTimeToDestination)
             {
+                //Should stop now
                 isRunning = false;
-                Debug.Log("Should stop now");
-                rb.velocity = Vector3.zero;
                 CalculateDistance();
             }
         }
     }
 
-    void CalculateDistance(){
-
+    void CalculateDistance()
+    {
         float frontEdge = destination.position.z - (destination.transform.localScale.z / 2);
         float backEdge = destination.position.z + (destination.transform.localScale.z / 2);
         float objFrontEdge = transform.position.z + (transform.localScale.z / 2);
         float objBackEdge = transform.position.z - (transform.localScale.z / 2);
+        float dist = Mathf.Abs(objBackEdge - backEdge);
 
-        Debug.Log("frontEdge: "+frontEdge);
-        Debug.Log("backEdge: " + backEdge);
-        Debug.Log("object: " + transform.position.z);
+        if (playTimes == 1)
+            Jack.resultDistance = dist;
+        else
+            Finn.resultDistance = dist;
+
+        if (playTimes == 2){
+
+            Debug.Log("Jack got distance = " + Jack.resultDistance);
+            Debug.Log("Fin got distance = " + Finn.resultDistance);
+
+            GameObject.Find("HUDPanel").GetComponent<UIScript>().CompareDistance(Jack.resultDistance, Finn.resultDistance);
+            Jack.resultDistance = 0.0f;
+            Finn.resultDistance = 0.0f;
+            playTimes = 0;
+        }
 
         replayBtn.SetActive(true);
         resultTitle.enabled = true;
+        showGauge.enabled = true;
 
         if (objFrontEdge > frontEdge && objBackEdge < backEdge)
-        {
-            Debug.Log("Bingo!!");
             showGauge.text = "ON";
-        }
-        if(objBackEdge > backEdge)
-        {
-            float dist = objBackEdge - backEdge;
-            Debug.Log("distance: "+dist);
-            Debug.Log("Over shoot.");
 
+        if(objBackEdge > backEdge)
             showGauge.text = "over";
 
-        }
-        if(objFrontEdge < frontEdge){
-            float dist = frontEdge - objFrontEdge;
-            Debug.Log("distance: "+dist);
-            Debug.Log("Under shoot.");
-           
+        if(objFrontEdge < frontEdge)
             showGauge.text = "under";
-        }
+
     }
 
-    void OnTriggerEnter(Collider col)
-    {
-        //Debug.Log("Time Elapsed: " + timeElapsed);
-        //Debug.Log("Velocity: " + rb.velocity);
 
-        //col.gameObject.GetComponentInChildren<Renderer>().material.color = Color.red;
-    }
 }
